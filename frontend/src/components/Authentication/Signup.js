@@ -19,12 +19,36 @@ const Signup = () => {
     const [password, setPassword] = useState();
     const [pic, setPic] = useState();
     const [picLoading, setPicLoading] = useState(false);
+    const emailRegex =
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
     const submitHandler = async () => {
         setPicLoading(true);
         if (!name || !email || !password || !confirmpassword) {
             toast({
                 title: "Please Fill all the Feilds",
+                status: "warning",
+                duration: 5000,
+                isClosable: true,
+                position: "bottom",
+            });
+            setPicLoading(false);
+            return;
+        }
+        if (!email.match(/^[A-Za-z\._\-0-9]*[@][A-Za-z]*[\.][a-z]{2,4}$/)) {
+            toast({
+                title: "Please input your email",
+                status: "warning",
+                duration: 5000,
+                isClosable: true,
+                position: "bottom",
+            });
+            setPicLoading(false);
+            return;
+        }
+        if (password.length < 6) {
+            toast({
+                title: "Password must have at least 6 characters",
                 status: "warning",
                 duration: 5000,
                 isClosable: true,
