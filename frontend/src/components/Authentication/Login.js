@@ -70,6 +70,13 @@ const Login = () => {
     }
   };
 
+  const googleAuth = () => {
+		window.open(
+			`http://localhost:5000/auth/google`,
+			"_self"
+		);
+	};
+
   return (
     <VStack spacing="10px">
       <FormControl id="email" isRequired>
@@ -108,14 +115,12 @@ const Login = () => {
       </Button>
       <Button
         variant="solid"
-        colorScheme="red"
+        colorScheme="gray"
         width="100%"
-        onClick={() => {
-          setEmail("guest@example.com");
-          setPassword("123456");
-        }}
+        onClick={googleAuth}
       >
-        Get Guest User Credentials
+        <img src="./images/google.png" alt="google icon" width={20} height={20}/>
+				<span>Sign in with Google</span>
       </Button>
     </VStack>
   );

@@ -5,9 +5,11 @@ const color = require("colors");
 const userRoutes = require("./routes/userRoutes");
 const chatRoutes = require("./routes/chatRouters");
 const messageRoutes = require("./routes/messageRoutes");
+const authRoutes = require("./routes/auth");
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 const path = require("path");
-
+require("./config/passport");
+const cookieParser = require("cookie-parser");
 dotenv.config();
 connectDB();
 const app = express();
@@ -17,10 +19,12 @@ app.use(express.json());
 // app.get("/", (req, res) => {
 //     res.send("API is running");
 // });
+app.use(cookieParser());
 
 app.use("/api/user", userRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/message", messageRoutes);
+app.use("/auth", authRoutes);
 
 const __dirname1 = path.resolve();
 

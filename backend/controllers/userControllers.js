@@ -1,6 +1,10 @@
 const asyncHandler = require("express-async-handler");
 const User = require("../models/userModel");
 const generateToken = require("../config/generateToken");
+const passport = require("passport");
+require("dotenv").config();
+const mongoose = require("mongoose");
+const { ObjectId } = mongoose.Types;
 
 //@description     Get or Search all users
 //@route           GET /api/user?search=
@@ -82,4 +86,55 @@ const authUser = asyncHandler(async (req, res) => {
   }
 });
 
-module.exports = { registerUser, authUser, allUsers };
+const loginWithGoogle = (req, res, next) => {
+  passport.authenticate("google", { scope: ["profile", "email"] })(
+    req,
+    res,
+    next
+  );
+};
+
+const loginWithGoogleCallback = async (req, res, next) => {
+  passport.authenticate("google", async (profile) => {
+    try {
+      if (!profile) {
+        throw {
+          code: 1,
+          message: "Đăng nhập thất bại. Hãy thử lại",
+        };
+      }
+
+      const id = new ObjectId(Buffer.from(profile.id).toString('hex').slice(0, 24));
+
+      let user = await User.findById(id);
+
+      if (!user) {
+        user = await User.create({
+          _id: id,
+          name: profile.displayName,
+          email: profile.emails[0].value,
+          pic: profile.photos[0].value,
+        });
+      }
+
+      res.cookie("userInfo", {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        isAdmin: user.isAdmin,
+        pic: user.pic,
+        token: generateToken(user._id),
+      }, {
+        maxAge: 24 * 60 * 60 * 1000,
+      });
+
+
+       res.redirect("http://localhost:3000");
+    } catch (error) {
+      console.log(error);
+      res.redirect("http://localhost:5000/auth/google");
+    }
+  })(req, res, next);
+};
+
+module.exports = { registerUser, authUser, allUsers,loginWithGoogle, loginWithGoogleCallback  };
